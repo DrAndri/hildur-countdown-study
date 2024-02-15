@@ -1,10 +1,10 @@
-FROM mhart/alpine-node:latest AS builder
+FROM node:alpine:latest AS builder
 WORKDIR /app
 COPY . .
 RUN yarn install
 RUN yarn run build
 
-FROM mhart/alpine-node:latest
+FROM node:alpine:latest
 RUN yarn global add serve
 WORKDIR /app
 COPY --from=builder /app/build .
