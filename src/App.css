@@ -10,7 +10,7 @@
 }
 
 .App span {
-  animation: changeColor 1s infinite alternate;
+  animation: changeColor 10s infinite alternate;
 }
 
 @media only screen and (max-width: 600px) {
@@ -27,13 +27,13 @@
     color: #ffa500;
   }
   37.5% {
-    color: #ffff00;
+    color: #b6b600;
   }
   50% {
-    color: #7fff00;
+    color: #61c300;
   }
   62.5% {
-    color: #00ffff;
+    color: #00b0b0;
   }
   75% {
     color: #0000ff;
