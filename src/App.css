@@ -1,47 +1,98 @@
-.App {
-  text-align: center;
-  width: 100%;
-  height: 100vh;
-  font-size: 20em;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-  flex-direction: column;
+@property --myColor1 {
+  syntax: "<color>";
+  initial-value: rgba(255, 0, 255, 0.5);
+  inherits: false;
 }
 
-.App span {
-  animation: changeColor 10s infinite alternate;
+@property --myColor2 {
+  syntax: "<color>";
+  initial-value: rgba(255, 50, 50, 0.5);
+  inherits: false;
+}
+
+@property --myColor3 {
+  syntax: "<color>";
+  initial-value: rgba(0, 229, 255, 0.5);
+  inherits: false;
+}
+
+@property --myColor4 {
+  syntax: "<color>";
+  initial-value: rgba(0, 255, 55, 1);
+  inherits: false;
+}
+
+#silence {
+  display: none;
+}
+
+.App {
+  font-size: 15em;
+}
+
+.background {
+  transition: --myColor1 1s, --myColor2 1s, --myColor3 1s, --myColor4 1s;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: radial-gradient(
+      farthest-side at bottom left,
+      var(--myColor1),
+      transparent 100%
+    ),
+    radial-gradient(
+      farthest-corner at bottom right,
+      var(--myColor2),
+      transparent 100%
+    ),
+    radial-gradient(
+      farthest-corner at top right,
+      var(--myColor3),
+      transparent 100%
+    ),
+    radial-gradient(
+      farthest-corner at top left,
+      var(--myColor4),
+      transparent 100%
+    );
+}
+
+.step-0 {
+  --myColor1: rgba(255, 0, 255, 1);
+  --myColor2: rgba(255, 50, 50, 1);
+  --myColor3: rgba(0, 229, 255, 1);
+  --myColor4: rgba(0, 255, 55, 1);
+}
+
+.step-1 {
+  --myColor1: rgba(255, 50, 50, 0.5);
+  --myColor2: rgba(0, 229, 255, 0.5);
+  --myColor3: rgba(255, 0, 255, 0.5);
+  --myColor4: rgba(255, 153, 0, 1);
+}
+
+.step-2 {
+  --myColor1: rgba(0, 229, 255, 0.5);
+  --myColor2: rgba(255, 0, 255, 0.5);
+  --myColor3: rgba(255, 50, 50, 0.5);
+  --myColor4: rgba(255, 0, 238, 1);
+}
+
+.image-center {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-center img {
+  width: 50%;
 }
 
 @media only screen and (max-width: 600px) {
   .App {
-    height: unset;
-  }
-}
-
-@keyframes changeColor {
-  12.5% {
-    color: #ff0000;
-  }
-  25% {
-    color: #ffa500;
-  }
-  37.5% {
-    color: #b6b600;
-  }
-  50% {
-    color: #61c300;
-  }
-  62.5% {
-    color: #00b0b0;
-  }
-  75% {
-    color: #0000ff;
-  }
-  87.5% {
-    color: #9932cc;
-  }
-  100% {
-    color: #ff1493;
+    font-size: 8em;
   }
 }
