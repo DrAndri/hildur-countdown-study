@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Countdown from "react-countdown";
 import ReactPageScroller from "react-page-scroller";
 import TextSection from "./sections/TextSection/TextSection.tsx";
@@ -10,6 +10,26 @@ import neverGiveUp from "./assets/never-give-up.webp";
 import "./App.css";
 
 function App() {
+  const useAudio = (url) => {
+    const [audio] = useState(new Audio(url));
+    const [playing, setPlaying] = useState(false);
+
+    const toggle = () => setPlaying(!playing);
+
+    useEffect(() => {
+      playing ? audio.play() : audio.pause();
+    }, [playing]);
+
+    useEffect(() => {
+      audio.addEventListener("ended", () => setPlaying(false));
+      return () => {
+        audio.removeEventListener("ended", () => setPlaying(false));
+      };
+    }, []);
+
+    return [playing, toggle];
+  };
+  const [playing, toggle] = useAudio("./rain.mp4");
   const getAnchor = (): number => {
     const currentUrl = document.URL,
       urlParts = currentUrl.split("#");
@@ -61,12 +81,15 @@ function App() {
   };
 
   const begin = () => {
+    if (!playing) toggle();
     incrementPage();
   };
 
   const pages = [
     <div className="section">
-      <button onClick={begin}>Byrja</button>
+      <button className="begin-button" onClick={begin}>
+        Byrja
+      </button>
     </div>,
     <div className="section">
       <TextSection text={"Hæ"} fontSize="1.5em" />
@@ -149,17 +172,9 @@ function App() {
 
   return (
     <div className={"App"}>
-      <iframe
-        title="silence"
-        src="./250-milliseconds-of-silence.mp3"
-        allow="autoplay"
-        id="silence"
-      ></iframe>
-      <audio autoPlay>
-        <source src="./rain.mp4" type="audio/mp4" />
-      </audio>
       <div>
         <div className={"background step-" + (transitionPage % 3)} />
+        <div className="black" />
       </div>
       <ReactPageScroller
         pageOnChange={handlePageChange}
