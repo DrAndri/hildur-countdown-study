@@ -1,9 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import Countdown from "react-countdown";
-import ReactPageScroller, { SectionContainer } from "react-page-scroller";
-import ReactAudioPlayer from "react-audio-player";
-import YZhanWeather from "yzhanweather";
+import ReactPageScroller from "react-page-scroller";
 import TextSection from "./sections/TextSection/TextSection.tsx";
 import ScrollArrow from "./components/ScrollArrow/ScrollArrow.tsx";
 import TextMorph from "./components/TextMorph/TextMorph.tsx";
@@ -12,10 +10,6 @@ import neverGiveUp from "./assets/never-give-up.webp";
 import "./App.css";
 
 function App() {
-  const yzhanweather = new YZhanWeather();
-  yzhanweather.run("rain", {
-    maxDuration: 10, // Default: 10s, this option can determine the speed of animations
-  });
   const getAnchor = (): number => {
     const currentUrl = document.URL,
       urlParts = currentUrl.split("#");
@@ -66,6 +60,93 @@ function App() {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const begin = () => {
+    incrementPage();
+  };
+
+  const pages = [
+    <div className="section">
+      <button onClick={begin}>Byrja</button>
+    </div>,
+    <div className="section">
+      <TextSection text={"Hæ"} fontSize="1.5em" />
+    </div>,
+    <div className="section">
+      <TextSection text={"Velkomin í slökunarmeðferðina"} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Tæmdu hugann þinn"} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Næstu mínútuna verða engar áhyggjur"} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Aðeins hugarró"} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Dragðu djúpt andann"} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Halda..."} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Og anda út"} />
+    </div>,
+    <div className="section">
+      <TextSection text={"Það sem þú þarft að muna er að"} />
+    </div>,
+    <TextMorph texts={["ÞÚ", "GETUR", "ÞETTA"]} />,
+    <div className="image-center">
+      <img src={neverGiveUp} alt="never give up" />
+    </div>,
+    <div className="section">
+      <div>
+        <Countdown date={dueDate} renderer={renderSeconds} /> sek til stefnu
+      </div>
+    </div>,
+    <div className="section">
+      <Countdown
+        date={dueDate}
+        renderer={(props) =>
+          props.completed
+            ? "TIL HAMINGJU!!!"
+            : props.total > 864000000 //10 days
+            ? "Ennþá nóg af tíma!"
+            : "Alveg að skella á!"
+        }
+      />
+    </div>,
+    <div className="section">
+      <TextSection text={"En líka"} />
+    </div>,
+    <div className="section">
+      <div>
+        <TextSection
+          text={"Þú ætlar að vera komin til mín eftir ekki minna en "}
+          fontSize="0.5em"
+        />
+        <br />
+        <Countdown
+          date={homeDate}
+          renderer={(props) =>
+            props.completed ? "NÚNA" : props.days + " daga"
+          }
+        />
+      </div>
+    </div>,
+    <div className="section">
+      <TextSection text={"Ég sakna þín meira en nokkur getur skilið ❤️"} />
+    </div>,
+    <div className="section">
+      <div>
+        <p>Þú kemur heim eftir</p>
+        <Countdown date={homeDate} renderer={renderer} />
+        <p>Þú ert að skila eftir</p>
+        <Countdown date={dueDate} renderer={renderer} />
+      </div>
+    </div>,
+  ];
+
   return (
     <div className={"App"}>
       <iframe
@@ -85,49 +166,13 @@ function App() {
         onBeforePageScroll={handleBeforePageChange}
         customPageNumber={currentPage}
       >
-        <TextSection text={"Hæ"} fontSize="1.5em" />
-        <TextSection text={"Velkomin í slökunarmeðferðina"} />
-        <TextSection text={"Tæmdu hugann þinn"} />
-        <TextSection text={"Næstu mínútuna verða engar áhyggjur"} />
-        <TextSection text={"Aðeins hugarró"} />
-        <TextSection text={"Dragðu djúpt andann"} />
-        <TextSection text={"Halda..."} />
-        <TextSection text={"Og anda út"} />
-        <TextSection text={"Það sem þú þarft að muna er að"} />
-        <TextMorph texts={["ÞÚ", "GETUR", "ÞETTA"]} />
-        <div className="image-center">
-          <img src={neverGiveUp} alt="never give up" />
-        </div>
-        <div>
-          <Countdown date={dueDate} renderer={renderSeconds} /> sek til stefnu
-        </div>
-        <div>
-          <Countdown
-            date={dueDate}
-            renderer={(props) =>
-              props.total > 864000000 //10 days
-                ? "Ennþá nóg af tíma!"
-                : "Alveg að skella á!"
-            }
-          />
-        </div>
-        <TextSection text={"En líka"} />
-        <div>
-          <TextSection
-            text={"Þú ætlar að vera komin til mín eftir ekki minna en "}
-            fontSize="0.5em"
-          />
-          <Countdown
-            date={homeDate}
-            renderer={(props) =>
-              props.completed ? "NÚNA" : props.days + " daga"
-            }
-          />
-        </div>
+        {pages}
       </ReactPageScroller>
-      <div onClick={incrementPage}>
-        <ScrollArrow />
-      </div>
+      {currentPage + 2 <= pages.length && (
+        <div onClick={incrementPage}>
+          <ScrollArrow />
+        </div>
+      )}
     </div>
   );
 }
