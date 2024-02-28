@@ -6,7 +6,7 @@ export default function TextSection(props: {
   fontSize?: string;
 }) {
   return (
-    <div className="component text-section">
+    <div className="text-section">
       <div style={props.fontSize ? { fontSize: props.fontSize } : {}}>
         {props.text}
       </div>

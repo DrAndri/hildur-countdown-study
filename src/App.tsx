@@ -5,64 +5,31 @@ import ReactPageScroller from "react-page-scroller";
 import TextSection from "./sections/TextSection/TextSection.tsx";
 import ScrollArrow from "./components/ScrollArrow/ScrollArrow.tsx";
 import TextMorph from "./components/TextMorph/TextMorph.tsx";
+import { getAnchor, useAudio } from "./utils.tsx";
 import neverGiveUp from "./assets/never-give-up.webp";
 
 import "./App.css";
+import { renderSeconds, renderer } from "./countdownRenderers.tsx";
 
 function App() {
-  const useAudio = (url) => {
-    const [audio] = useState(new Audio(url));
-    const [playing, setPlaying] = useState(false);
+  const [playingRain, toggleRain] = useAudio("./rain.mp4");
 
-    const toggle = () => setPlaying(!playing);
-
-    useEffect(() => {
-      playing ? audio.play() : audio.pause();
-    }, [playing]);
-
-    useEffect(() => {
-      audio.addEventListener("ended", () => setPlaying(false));
-      return () => {
-        audio.removeEventListener("ended", () => setPlaying(false));
-      };
-    }, []);
-
-    return [playing, toggle];
-  };
-  const [playing, toggle] = useAudio("./rain.mp4");
-  const getAnchor = (): number => {
-    const currentUrl = document.URL,
-      urlParts = currentUrl.split("#");
-    return urlParts.length > 1 && Number.isInteger(urlParts[1])
-      ? parseInt(urlParts[1])
-      : 0;
-  };
   const dueDate = new Date("2024-05-24T10:00:00");
   const homeDate = new Date("2024-03-31T23:59:59");
-  const [currentPage, setCurrentPage] = useState<number>(getAnchor() || 0);
-  const [transitionPage, setTransitionPage] = React.useState<number>(0);
-  const renderer = (props) => {
-    if (props.completed) {
-      // Render a completed state
-      return "ÞÚ ERT BÚIN AÐ SKILA!!!";
-    } else {
-      // Render a countdown
-      return (
-        <span>
-          {props.formatted.days} : {props.formatted.hours} :{" "}
-          {props.formatted.minutes} : {props.formatted.seconds}
-        </span>
-      );
-    }
-  };
 
-  const renderSeconds = (props) => {
-    if (props.completed) {
-      return "ÞÚ ERT BÚIN AÐ SKILA!!!";
-    } else {
-      return <span>{numberWithCommas(props.total / 1000)}</span>;
+  const [transitionPage, setTransitionPage] = React.useState<number>(0);
+  const [cyclePage, setCyclePage] = React.useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(getAnchor() || 0);
+
+  useEffect(() => {
+    if (currentPage === 6 || currentPage === 7 || currentPage === 11) {
+      const timeout = setTimeout(() => {
+        if (cyclePage >= 3) setCyclePage(0);
+        else setCyclePage(cyclePage + 1);
+      }, 1000);
+      return () => clearTimeout(timeout);
     }
-  };
+  }, [currentPage, cyclePage]);
 
   const handlePageChange = (number) => {
     setCurrentPage(number);
@@ -76,114 +43,108 @@ function App() {
     setCurrentPage(currentPage + 1);
   };
 
-  const numberWithCommas = (x) => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
   const begin = () => {
-    if (!playing) toggle();
+    if (!playingRain) toggleRain();
     incrementPage();
   };
 
+  const goToEnd = () => {
+    if (!playingRain) toggleRain();
+    setCurrentPage(pages.length - 1);
+  };
+
   const pages = [
-    <div className="section">
-      <button className="begin-button" onClick={begin}>
+    <div id="first-page button">
+      <button id="begin-button" className="button" onClick={begin}>
         Byrja
       </button>
+      <button id="goto-end-button" className="button" onClick={goToEnd}>
+        Countdown
+      </button>
     </div>,
-    <div className="section">
-      <TextSection text={"Hæ"} fontSize="1.5em" />
-    </div>,
-    <div className="section">
-      <TextSection text={"Velkomin í slökunarmeðferðina"} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Tæmdu hugann þinn"} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Næstu mínútuna verða engar áhyggjur"} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Aðeins hugarró"} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Dragðu djúpt andann"} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Halda..."} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Og anda út"} />
-    </div>,
-    <div className="section">
-      <TextSection text={"Það sem þú þarft að muna er að"} />
-    </div>,
+    <TextSection text={"Hæ"} fontSize="1.5em" />,
+    <TextSection text={"Velkomin í slökunarmeðferðina"} />,
+    <TextSection text={"Tæmdu hugann þinn"} />,
+    <TextSection text={"Næstu mínútuna verða engar áhyggjur"} />,
+    <TextSection text={"Aðeins hugarró"} />,
+    <TextSection text={"Dragðu djúpt andann"} />,
+    <TextSection text={"Halda..."} />,
+    <TextSection text={"Og anda út"} />,
+    <TextSection text={"Þú ert núna róleg"} />,
+    <TextSection text={"Það sem þú þarft að muna er að"} />,
     <TextMorph texts={["ÞÚ", "GETUR", "ÞETTA"]} />,
     <div className="image-center">
       <img src={neverGiveUp} alt="never give up" />
     </div>,
-    <div className="section">
-      <div>
-        <Countdown date={dueDate} renderer={renderSeconds} /> sek til stefnu
-      </div>
+    <div>
+      <Countdown date={dueDate} renderer={renderSeconds} /> sek til stefnu
     </div>,
-    <div className="section">
-      <Countdown
-        date={dueDate}
-        renderer={(props) =>
-          props.completed
-            ? "TIL HAMINGJU!!!"
-            : props.total > 864000000 //10 days
-            ? "Ennþá nóg af tíma!"
-            : "Alveg að skella á!"
-        }
+    <Countdown
+      date={dueDate}
+      renderer={(props) =>
+        props.completed
+          ? "TIL HAMINGJU!!!"
+          : props.total > 864000000 //10 days
+          ? "Ennþá nóg af tíma!"
+          : "Alveg að skella á!"
+      }
+    />,
+    <TextSection text={"En líka"} />,
+    <div>
+      <TextSection
+        text={"Þú ætlar að vera komin til mín eftir ekki minna en "}
+        fontSize="0.5em"
       />
-    </div>,
-    <div className="section">
-      <TextSection text={"En líka"} />
-    </div>,
-    <div className="section">
-      <div>
-        <TextSection
-          text={"Þú ætlar að vera komin til mín eftir ekki minna en "}
-          fontSize="0.5em"
-        />
-        <br />
-        <Countdown
-          date={homeDate}
-          renderer={(props) =>
-            props.completed ? "NÚNA" : props.days + " daga"
-          }
-        />
-      </div>
+      <br />
+      <Countdown
+        date={homeDate}
+        renderer={(props) => (props.completed ? "NÚNA" : props.days + " daga")}
+      />
     </div>,
     <div className="section">
       <TextSection text={"Ég sakna þín meira en nokkur getur skilið ❤️"} />
     </div>,
-    <div className="section">
-      <div>
-        <p>Þú kemur heim eftir</p>
-        <Countdown date={homeDate} renderer={renderer} />
-        <p>Þú ert að skila eftir</p>
-        <Countdown date={dueDate} renderer={renderer} />
-      </div>
+    <div>
+      <div>Þú kemur heim eftir</div>
+      <Countdown date={homeDate} renderer={renderer} />
+      <div>Þú ert að skila eftir</div>
+      <Countdown date={dueDate} renderer={renderer} />
     </div>,
   ];
+
+  const getTransitionPage = () => {
+    if (transitionPage === 6 || transitionPage === 7 || transitionPage === 11)
+      return cyclePage;
+    else if (
+      transitionPage === 8 ||
+      transitionPage === 9 ||
+      transitionPage === 10 ||
+      transitionPage === 11
+    )
+      return transitionPage;
+    else return transitionPage % 4;
+  };
 
   return (
     <div className={"App"}>
       <div>
-        <div className={"background step-" + (transitionPage % 3)} />
+        <div className={"background step-" + getTransitionPage()} />
         <div className="black" />
       </div>
-      <ReactPageScroller
-        pageOnChange={handlePageChange}
-        onBeforePageScroll={handleBeforePageChange}
-        customPageNumber={currentPage}
-      >
-        {pages}
-      </ReactPageScroller>
-      {currentPage + 2 <= pages.length && (
+      <div id="page-scroller">
+        <ReactPageScroller
+          pageOnChange={handlePageChange}
+          onBeforePageScroll={handleBeforePageChange}
+          customPageNumber={currentPage}
+        >
+          {pages.map((page, index) => (
+            <div className="section" key={index}>
+              {page}
+            </div>
+          ))}
+        </ReactPageScroller>
+      </div>
+      {currentPage + 2 <= pages.length && currentPage !== 0 && (
         <div onClick={incrementPage}>
           <ScrollArrow />
         </div>
