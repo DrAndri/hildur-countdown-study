@@ -15,7 +15,7 @@ function App() {
   const [playingRain, toggleRain] = useAudio("./rain.mp4");
 
   const dueDate = new Date("2024-05-24T10:00:00");
-  const homeDate = new Date("2024-03-31T23:59:59");
+  const homeDate = new Date("2024-03-26T23:20:00");
 
   const [transitionPage, setTransitionPage] = React.useState<number>(0);
   const [cyclePage, setCyclePage] = React.useState<number>(0);
